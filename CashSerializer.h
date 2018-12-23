@@ -19,11 +19,23 @@ namespace Types
 			return a > b;
 		}
 	};
-
-	typedef std::multimap<size_t, std::string, comp>	WordMap;
-	typedef std::map<std::string, WordMap >				Cache;
-	typedef std::map<std::string, size_t>				FileVoc;
-	typedef std::map<fs::path, time_t>	FilesData;
+	struct comp2
+	{
+		bool operator() (
+			const std::pair<size_t, size_t>& a,
+			const std::pair<size_t, size_t>& b)
+		{
+			return a.first != b.first ?
+				a.first > b.first :
+				a.second > b.second;
+		}
+	};
+	
+	typedef std::multimap<std::pair<size_t, size_t>, std::string, comp2>	Tout;
+	typedef std::multimap<size_t, std::string, comp>						WordMap;
+	typedef std::map<std::string, WordMap >									Cache;
+	typedef std::map<std::string, size_t>									FileVoc;
+	typedef std::map<fs::path, time_t>										FilesData;
 }
 class Serializer
 {
