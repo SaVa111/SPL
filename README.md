@@ -3,6 +3,7 @@ Special Programming Languages
 # Problem #1
 Quick sort algorithm:
 
+'''c++
 template<typename FUNCTOR, typename IT>
 void QuickSort(IT first, IT last, FUNCTOR cmp)
 {
@@ -29,6 +30,7 @@ void QuickSort(IT first, IT last, FUNCTOR cmp)
 	QuickSort(first, left, cmp);
 	QuickSort(right, last, cmp);
 }
+'''
 
 # Problem #2
 
