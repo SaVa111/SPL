@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <map>
 #include <thread>
+#include <sstream>
 
 #include <windows.h>
 #include <sys/types.h>
@@ -167,6 +168,86 @@ bool CheckFiles(const fs::path& path)
 		Serializer::GetFilesData(path);
 }
 
+void Load(const fs::path& path, Types::Cache& cache)
+{
+	std::cout << "Loading...\n";
+	if (CheckFiles(path))
+	{
+		std::cout << "Some files was chenged.\nDo you want to reindex?\n[y/n]\n";
+		while (true)
+		{
+			std::string ansver;
+			std::cin >> ansver;
+			if (ansver == "y")
+			{
+				cache = Index(path);
+				break;
+			}
+			else if (ansver == "n")
+				break;
+			else
+			{
+				std::cout << "[y/n]?\n";
+			}
+		}
+	}
+	else
+	{
+		cache = Serializer::Deserialize(path);
+		DebugCache(cache);
+	}
+	GreenMassege("Done\n");
+}
+
+Types::WordMap::const_iterator GetCount4File(
+	const Types::WordMap& wordmap, const std::string& word)
+{
+	Types::WordMap::const_iterator it = wordmap.cbegin();
+
+	for (; it != wordmap.end(); ++it)
+		if (it->second == word)
+			break;
+
+	return it;
+}
+
+Types::Tout GetOut(
+	std::vector<std::string>& words,
+	Types::Cache& cache)
+{
+	std::vector<Types::WordMap> found;
+	Types::Tout result;
+	for (size_t i = 0; i < words.size(); ++i)
+	{
+		FormatStr(words[i]);
+		Types::Cache::iterator it = cache.find(words[i]);
+		if (it != cache.end())
+		{
+			found.push_back(it->second);
+		}
+	}
+	
+	std::map<std::string, std::pair<size_t, size_t>> buf;
+	for (size_t i = 0; i < found.size(); ++i)
+	{
+		for(Types::WordMap::const_iterator it = found[i].cbegin();
+			it != found[i].end(); ++it)
+		{
+			buf[it->second] = buf.find(it->second) == buf.end() ? 
+				std::make_pair(size_t(1), it->first) :
+				std::make_pair(buf[it->second].first + 1, buf[it->second].second + it->first);
+		}
+	}
+
+	for (std::map<std::string, std::pair<size_t, size_t>>::const_iterator it = buf.begin();
+		it != buf.end(); ++it)
+	{
+		result.insert(std::make_pair(it->second, it->first));
+	}
+
+	return result;
+}
+
 int main(size_t argc, char* args[])
 {
 	setlocale(LC_ALL, "rus");
@@ -209,9 +290,22 @@ int main(size_t argc, char* args[])
 		{
 			try
 			{
+				std::string buf;
 				std::string command;
-				std::cin >> command;
-
+				std::vector<std::string> args;
+				std::getline(std::cin, buf);
+				std::stringstream ss(buf);
+				if (buf[0] == '!')
+				{
+					ss >> command;
+				}
+				while (!ss.eof())
+				{
+					std::string word;
+					ss >> word;
+					args.push_back(word);
+				}
+				
 				if (command == "!help")
 				{
 					std::cout << "In program commands:\n";
@@ -223,41 +317,24 @@ int main(size_t argc, char* args[])
 				}
 				else if (command == "!index")
 				{
+					if (path.empty())
+						Error("Please check the directory!");
+
 					cache = Index(path);
 				}
 				else if (command == "!cd")
 				{
-					std::cin >> path;
+					if (args.size() > 1)
+						Error("Wrong path.");
+
+					path = args[0];
 				}
 				else if (command == "!load")
 				{
-					std::cout << "Loading...\n";
-					if (CheckFiles(path))
-					{
-						std::cout << "Some files was chenged.\nDo you want to reindex?\n[y/n]\n";
-						while (true)
-						{
-							std::string ansver;
-							std::cin >> ansver;
-							if (ansver == "y")
-							{
-								cache = Index(path);
-								break;
-							}
-							else if (ansver == "n")
-								break;
-							else
-							{
-								std::cout << "[y/n]?\n";
-							}
-						}
-					}
-					else
-					{
-						cache = Serializer::Deserialize(path);
-						DebugCache(cache);
-					}
-					GreenMassege("Done\n");
+					if (path.empty())
+						Error("Please check the directory!");
+
+					Load(path, cache);
 				}
 				else if (command == "!exit")
 				{
@@ -265,16 +342,21 @@ int main(size_t argc, char* args[])
 				}
 				else
 				{
-					if (command[0] == '!')
+					if (!command.empty())
 						Error("Unknown comand.");
-					if (cache.find(command) == cache.end())
-						Error("Word not found.");
+
+					Types::Tout out = GetOut(args, cache);
+
+					if (out.empty())
+						Error("Not found!");
 
 					GreenMassege("Found in fles:\n");
-					Types::WordMap::const_iterator it = cache[command].begin();
-					for (size_t i = 0; i < cache[command].size(); ++i, ++it)
+					
+					for (Types::Tout::const_iterator it = out.begin();
+						it != out.end(); ++it)
 					{
-						std::cout << it->second << " " << it->first << " times\n";
+						std::cout << it->second << " " << it->first.second << " times with "
+							<< it->first.first << " words\n";
 					}
 				}
 			}
