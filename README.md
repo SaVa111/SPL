@@ -63,7 +63,7 @@ void CreateSpiralMatrix(std::vector<std::vector<int> >& matrix, size_t idx = 0)
 ```
 If run with argument "test", it runs test cases
 
-!(Screenshot_3.png)
+!(/Screenshot_3.png)
 
 # Problem #3
 
