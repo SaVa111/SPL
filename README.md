@@ -72,11 +72,11 @@ You can search which files include the words you search.
 It shows you sorted result.
 
 In program commands: <br />
-For searching just write text.
-!index - recalculate cache.
-!load - to reload cache.
-!cd - change directory.
-!exit - close application.
+For searching just write text. <br />
+!index - recalculate cache. <br />
+!load - to reload cache. <br />
+!cd - change directory. <br />
+!exit - close application. <br />
 
 ### Indexing:
 
