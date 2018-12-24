@@ -63,6 +63,7 @@ void CreateSpiralMatrix(std::vector<std::vector<int> >& matrix, size_t idx = 0)
 ```
 If run with argument "test", it runs test cases
 
+!(Screenshot_3.png)
 
 # Problem #3
 
@@ -78,6 +79,7 @@ In program commands:
 	!exit - close application.
 
 Indexing:
+!(Screenshot_1.png)
 
 Finding words:
-
+!(Screenshot_2.png)
