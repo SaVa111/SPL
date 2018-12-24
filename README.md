@@ -71,7 +71,7 @@ This app indexing text files in directory and save it.
 You can search which files include the words you search.
 It shows you sorted result.
 
-In program commands:
+In program commands: <br />
 For searching just write text.
 !index - recalculate cache.
 !load - to reload cache.
