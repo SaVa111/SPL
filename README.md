@@ -78,8 +78,9 @@ In program commands:
 	!cd - change directory.
 	!exit - close application.
 
-Indexing:
+### Indexing:
+
 ![](/Screenshot_1.png)
 
-Finding words:
+### Finding words:
 ![](/Screenshot_2.png)
